@@ -1,5 +1,6 @@
 # Custom
-Data/
+Data/*
+!Data/nutrition.csv
 
 
 # Byte-compiled / optimized / DLL files
