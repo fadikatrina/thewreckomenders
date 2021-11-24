@@ -6,12 +6,20 @@ from lenskit.algorithms.user_knn import UserUser
 from logger import l
 
 
+df_recipes = None
+
+
 # todo add explanations
 # todo add evaluation
-def group_recommender(df_users, df_recipes, df_recipes_full, chosen_strategy):
+def group_recommender(df_users, df_recipes_full, chosen_strategy):
 	"""
 	:param chosen_strategy: 1 for most pleasure, 2 for approval voting, 3 for least misery
 	"""
+	global df_recipes
+	# data loading usually in `data_load.py` but since this takes forever, would prefer to run it only if necessary
+	# since its global will run only once per application cycle even if knn is run multiple times
+	if not df_recipes:
+		df_recipes = pd.read_csv('Data/processed/knn_recipes.csv')
 
 	if chosen_strategy not in [1, 2, 3]:
 		raise ValueError("Group recommender: chosen strategy has to be 1 or 2 or 3")

@@ -1,9 +1,25 @@
 import pandas as pd
 from ast import literal_eval
 from logger import l
+from pathlib import Path
+import os
+
 
 if __name__ == "__main__":
 	l.info("Data prep start")
+
+	# Directory management
+	Path("/Data/processed").mkdir(parents=True, exist_ok=True)
+	if os.path.isfile("Data/processed/knn_recipes.csv"):
+		input("Seems like data prep is already done, no need to run this step everytime, if you insist press enter to continue")
+	try:
+		os.remove("Data/processed/knn_recipes.csv")
+		os.remove("Data/processed/knn_users.csv")
+		os.remove("Data/processed/group_recipes.csv")
+	except OSError:
+		l.debug("Could not delete one or more file, maybe they dont exist anyways")
+		pass
+
 	# individual recommenders preparation - kNN
 	df_users = pd.read_csv('Data/PP_users.csv')
 	df_recipes = pd.read_csv('Data/PP_recipes.csv')

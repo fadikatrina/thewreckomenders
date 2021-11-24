@@ -6,10 +6,18 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from logger import l
 
+df_recipes = None
+
 
 # todo add explanations
 # todo add evaluation
-def knn(df_users, df_recipes, recipe_data):
+def knn(df_users, recipe_data):
+	global df_recipes
+	# data loading usually in `data_load.py` but since this takes forever, would prefer to run it only if necessary
+	# since its global will run only once per application cycle even if knn is run multiple times
+	if not df_recipes:
+		df_recipes = pd.read_csv('Data/processed/knn_recipes.csv')
+
 	tags = recipe_data['tags']
 	steps = recipe_data['steps']
 	ingredients = recipe_data['ingredients']

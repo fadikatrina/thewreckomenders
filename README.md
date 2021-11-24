@@ -1,14 +1,13 @@
 # The Wreckomenders - RecSys Group Project at DKE UM
-
-
-## Big stuff programming wise
-- Figure out data management - see todos in `data_prep.py` and `main.py`
+Recommend, explain, evaluate for individuals and groups food recipes.
 
 ## Getting started
 Using Python 3.7, package versions specified in requirements txt    
 1. Create virtual env
 2. Install requirements from mac/windows requirements
-3. Run main.py
+3. Download the dataset from https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions and place the extracted zip in `/Data`
+4. Run `data_prep.py` (once only)
+5. Run `main.py` (see the file main function for more details)
 
 ## Conventions
 ### Comments
