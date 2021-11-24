@@ -6,8 +6,8 @@ Using Python 3.7, package versions specified in requirements txt
 1. Create virtual env
 2. Install requirements from mac/windows requirements
 3. Download the dataset from https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions and place the extracted zip in `/Data`
-4. Run `data_prep.py` (once only)
-5. Run `main.py` (see the file main function for more details)
+4. Run `data_prep.py` (only once ever)
+5. Run `main.py` (check the file for more details)
 
 ## Conventions
 ### Comments
@@ -52,6 +52,7 @@ Using Python 3.7, package versions specified in requirements txt
 ## Midterm Feedback
 
 10, 5, 7, 8 = 7.5
+(evaluations and explanations are bbbbaaaadddd)
 
 First, we particularly appreciated the choice of the dataset and the deepen analysis you performed on aspects like sparsity and balance. Nice that you plan to use implicit feedback to tackle the sparsity problem. The proposed hybrid approach, using popularity based explanations to face the cold-start problem and switch to a content based when you have enough feedback, is interesting. You might have more information on how to implement that from the lecture on Hybrid recommenders next Thursday. Also, the idea of a post-filtering based on a healthy factor is really nice.
 Regarding the group recommender, we suggest you think of a scenario in which your system is providing the recommendation. Regarding the explanations, this is the more critical point. We understand that spending so much time analysing the dataset and the recommendation strategies, this aspect was omitted till now. This is not a big problem, but we want to encourage you to start reasoning about it.

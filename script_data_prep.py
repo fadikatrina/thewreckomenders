@@ -3,6 +3,8 @@ from ast import literal_eval
 from logger import l
 from pathlib import Path
 import os
+from script_reliable import generate_reliable_csv
+from script_samples import generate_sample_csvs
 
 
 if __name__ == "__main__":
@@ -10,6 +12,7 @@ if __name__ == "__main__":
 
 	# Directory management
 	Path("/Data/processed").mkdir(parents=True, exist_ok=True)
+	Path("/Data/samples").mkdir(parents=True, exist_ok=True)
 	if os.path.isfile("Data/processed/knn_recipes.csv"):
 		input("Seems like data prep is already done, no need to run this step everytime, if you insist press enter to continue")
 	try:
@@ -55,5 +58,8 @@ if __name__ == "__main__":
 	df_recipes_full.drop('description', axis=1, inplace=True)
 	df_recipes_full = df_recipes_full.rename(columns={'id': 'item'})
 	df_recipes_full.to_csv("Data/processed/group_recipes.csv")
+
+	generate_reliable_csv()
+	generate_sample_csvs()
 
 	l.info("Data prep finish")

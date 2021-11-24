@@ -13,7 +13,7 @@ df_recipes = None
 # todo add evaluation
 def knn(df_users, recipe_data):
 	global df_recipes
-	# data loading usually in `data_load.py` but since this takes forever, would prefer to run it only if necessary
+	# data loading usually in `helpers_data_load.py` but since this takes forever, would prefer to run it only if necessary
 	# since its global will run only once per application cycle even if knn is run multiple times
 	if not df_recipes:
 		df_recipes = pd.read_csv('Data/processed/knn_recipes.csv')
