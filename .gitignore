@@ -136,3 +136,5 @@ dmypy.json
 .ipynb_checkpoints
 .idea
 .DS_Store
+logs
+/scratch.py
