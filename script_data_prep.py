@@ -5,6 +5,7 @@ from pathlib import Path
 import os
 from script_reliable import generate_reliable_csv
 from script_samples import generate_sample_csvs
+from script_popular import generate_popular_csv
 
 
 if __name__ == "__main__":
@@ -19,6 +20,7 @@ if __name__ == "__main__":
 		os.remove("Data/processed/knn_recipes.csv")
 		os.remove("Data/processed/knn_users.csv")
 		os.remove("Data/processed/group_recipes.csv")
+		os.remove("Data/processed/reliable.csv")
 	except OSError:
 		l.debug("Could not delete one or more file, maybe they dont exist anyways")
 		pass
@@ -61,5 +63,6 @@ if __name__ == "__main__":
 
 	generate_reliable_csv()
 	generate_sample_csvs()
+	generate_popular_csv()
 
 	l.info("Data prep finish")

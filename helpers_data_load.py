@@ -4,6 +4,9 @@ from logger import l
 l.debug("Data load start")
 # df_recipes is loaded in kNN, and group recommender
 
+# Non_personalised
+df_popular = pd.read_csv('Data/processed/popular.csv')
+
 # kNN
 nutrition_data = pd.read_csv('Data/nutrition.csv', sep=';')
 recipe_data = pd.read_csv('Data/RAW_recipes.csv', sep=',')
