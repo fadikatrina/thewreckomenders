@@ -9,8 +9,8 @@ from logger import l
 df_recipes = None
 
 
-# todo add explanations
-# todo add evaluation
+# todo:high add explanations
+# todo:high add evaluation
 def knn(df_users, recipe_data):
 	global df_recipes
 	# data loading usually in `helpers_data_load.py` but since this takes forever, would prefer to run it only if necessary
@@ -43,9 +43,9 @@ def knn(df_users, recipe_data):
 	y_pred_train = knn.predict(X_train)
 	y_pred_test = knn.predict(X_test)
 
-	# TODO compare expected outputs with actual outputs
+	# todo:high compare expected outputs with actual outputs
 
-	# fixme there is an error thrown here
+	# fixme:high there is an error thrown here
 	l.info('Accuracy on training data =', metrics.accuracy_score(np.array(y_train.to_list()), y_pred_train))
 	l.info('Accuracy on testing data =', metrics.accuracy_score(np.array(y_test.to_list()), y_pred_test))
 	l.info(metrics.classification_report(np.array(y_test.to_list()), y_pred_test))

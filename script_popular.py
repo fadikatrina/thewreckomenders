@@ -1,7 +1,9 @@
 import pandas as pd
+from logger import l
 
 
 def generate_popular_csv():
+	l.info("Started generating csv with popular recipes")
 	df_interactions = pd.read_csv('Data/RAW_interactions.csv')
 	df_recipes = pd.read_csv('Data/RAW_recipes.csv')
 	df_recipes.drop(

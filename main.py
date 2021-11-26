@@ -1,8 +1,8 @@
 from logger import l
 from helpers_general import sample_users, how_many_reviews
 from rec_non_personalised import popularity_based
-from rec_content_based import tf_idf
-from rec_individual import knn
+from rec_individual_content_based import dont_know_yet
+from rec_individual_knn import knn
 from rec_group import group_recommender
 from helpers_data_load import df_users, recipe_data, df_recipes_full
 
@@ -25,8 +25,8 @@ settings = {
 
 
 # enh:med make one function that all the algorithms call with the recommendations and explanations so the output is
-#  comparable/measurable easily
-# todo actually filter according to the variables input by the user
+#  comparable/measurable easily todo:high actually filter according to the variables input by the user - whole team
+#   needs to agree on mechanism for this
 def start(config={}):
 	l.debug("Application start")
 	if not config:
@@ -83,8 +83,8 @@ def start(config={}):
 				if len(config['keywords']) == 0:
 					l.info("No keywords provided, exiting")
 					exit(0)
-				l.debug("Starting TF-IDF")
-				tf_idf(config['keywords'])
+				l.debug("Starting Content Based Individual Recommedner")
+				dont_know_yet(config['keywords'])
 			else:
 				l.info(
 					f"The user has {user_reviews_count}, which is more than {config['min_reviews_for_personalised']} reviews, making individual recommendations using kNN")
@@ -93,7 +93,7 @@ def start(config={}):
 		more_recs = int(input("Input 0 to quit, 1 to try another algorithm") or "0")
 
 
-# enh could parallelize the start function for more than 1 setting file,
+# enh:med could parallelize the start function for more than 1 setting file,
 #  as the data is loaded at the beginning and not for each start call
 #  could be an issue with the way the big recipes df is loaded in knn and group
 if __name__ == "__main__":

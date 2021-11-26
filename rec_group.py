@@ -1,16 +1,15 @@
 import pandas as pd
 from filter_healthy import apply_health_filter
-import itertools
-from lenskit.algorithms import Recommender
-from lenskit.algorithms.user_knn import UserUser
+from rec_individual_cf_user import user_user_cf
+
 from logger import l
 
 
 df_recipes = None
 
 
-# todo add explanations
-# todo add evaluation
+# todo:high add explanations
+# todo:high add evaluation
 def group_recommender(df_users, df_recipes_full, chosen_strategy):
 	"""
 	:param chosen_strategy: 1 for most pleasure, 2 for approval voting, 3 for least misery
@@ -24,7 +23,7 @@ def group_recommender(df_users, df_recipes_full, chosen_strategy):
 	if chosen_strategy not in [1, 2, 3]:
 		raise ValueError("Group recommender: chosen strategy has to be 1 or 2 or 3")
 
-	# todo switch this to the user provided parameters from main
+	# todo:high switch this to the user provided parameters from main
 	users_ratings = df_users.groupby(['user']).count()  # count the ratings for each user
 	selected = users_ratings['rating'] > 30  # keep only 30 + ratings
 	selected_users = users_ratings.loc[selected]
@@ -48,16 +47,12 @@ def group_recommender(df_users, df_recipes_full, chosen_strategy):
 	l.info(f'Recipes that have been rated by the currently selected group: {len(group_seen_recipes)}')
 	l.info(f'New recipes that the group didnt try yet: {len(group_unseen_recipes)}')
 
-	# exp would be interesting to try different algorithms for prediction and see their affect on the number of
+	# exp:easy would be interesting to try different algorithms for prediction and see their affect on the number of
 	#  missing ratings and coverage/accuracy metrics
-	user_user = UserUser(15, min_nbrs=3)  # Minimum (3) and maximum (12) number of neighbors to consider
-	recsys = Recommender.adapt(user_user)
-	recsys.fit(df_users)
-	group_unseen_df = pd.DataFrame(list(itertools.product(group_users, group_unseen_recipes)), columns=['user', 'item'])
-	group_unseen_df['predicted_rating'] = recsys.predict(group_unseen_df)
-	# remove the recipes we couldn't get a prediction for
-	# enh log how many recipes dont have metrics
-	group_unseen_df = group_unseen_df[group_unseen_df['predicted_rating'].notna()]
+
+	# todo:med switch these variables from being provided to CF here to being found by the CF itself,
+	#  i.e. better decoupling
+	group_unseen_df = user_user_cf(df_users, group_users, group_unseen_recipes)
 
 	# Min-Max normalization of predicted_ratings
 	max_val = group_unseen_df['predicted_rating'].max()
@@ -77,7 +72,7 @@ def group_recommender(df_users, df_recipes_full, chosen_strategy):
 
 def strategy_least_misery(group_unseen_df, df_recipes_full):
 	least_misery_df = group_unseen_df.groupby(['item']).min().reset_index()
-	# TODO: Find name of recipe from the RAW data
+	# todo:high Find name of recipe from the RAW data
 	least_misery_df = least_misery_df.join(df_recipes_full['name'], on='item')
 	items_lm = least_misery_df['item'].copy()
 	healthy_lm = apply_health_filter(items_lm)
@@ -91,7 +86,7 @@ def strategy_least_misery(group_unseen_df, df_recipes_full):
 
 def strategy_most_pleasure(group_unseen_df, df_recipes_full):
 	most_pleasure_df = group_unseen_df.groupby(['item']).max().reset_index()
-	# TODO: Find name of recipe from the RAW data
+	# todo:high Find name of recipe from the RAW data
 	items_mp = most_pleasure_df['item'].copy()
 	healthy_mp = apply_health_filter(items_mp)
 

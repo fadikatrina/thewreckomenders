@@ -1,0 +1,4 @@
+
+
+def svd():
+	raise NotImplementedError
