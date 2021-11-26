@@ -1,8 +1,8 @@
 import pandas as pd
 from logger import l
+import spacy
 
 l.debug("Data load start")
-# df_recipes is loaded in kNN, and group recommender
 
 # Non_personalised
 df_popular = pd.read_csv('Data/processed/popular.csv')
@@ -14,6 +14,10 @@ df_users = pd.read_csv('Data/processed/knn_users.csv')
 
 # Group
 df_recipes_full = pd.read_csv('Data/processed/group_recipes.csv')
+
+# NLP Spacy
+nlp = spacy.load('en_core_web_sm')
+
 
 l.debug("Data load finish")
 
