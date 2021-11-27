@@ -1,9 +1,8 @@
 import pandas as pd
-from helpers_data_load import df_users
 from logger import l
 
 
-def generate_reliable_csv():
+def generate_reliable_csv(df_users):
     l.info("Started generating reliability csv")
     df_sum_of_ratings = df_users.groupby("item").agg(
         sum_of_ratings=pd.NamedAgg(column="rating", aggfunc=sum)
