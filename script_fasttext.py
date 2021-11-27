@@ -1,7 +1,7 @@
 import fasttext
 import pandas as pd
 import spacy
-from utils.logger import l
+from logger import l
 import string
 import random
 from tqdm import tqdm
@@ -41,7 +41,7 @@ def test_model_manually():
 
 
 def quantize_and_test():
-	l.info("Qunatizing model")
+	l.info("Quantizing model")
 	model = fasttext.load_model("Data/processed/fasttext.bin")
 	model.quantize(input='Data/processed/fasttext_training_enriched.txt')
 	l.info("Testing quantized model")
@@ -79,7 +79,7 @@ def spacy_process(text):
 
 
 def make_recipe_id_user_id_file():
-	df_interaction = pd.read_csv('../Data/RAW_interactions.csv')
+	df_interaction = pd.read_csv('Data/RAW_interactions.csv')
 	df_interaction = df_interaction.loc[(df_interaction['rating'].astype(int) >= 4)]
 	df_interaction['user_id'] = df_interaction['user_id'].apply(str)
 	df_interaction = df_interaction.groupby(['recipe_id']).agg({'user_id': lambda x: ' '.join(x)})
@@ -97,7 +97,7 @@ def clean_and_export_recipes():
 
 	l.info("Preparing clean training file for fasttext")
 
-	df_recipes = pd.read_csv('../Data/RAW_recipes.csv')
+	df_recipes = pd.read_csv('Data/RAW_recipes.csv')
 	df_recipes.drop(['minutes', 'submitted', 'nutrition', 'n_steps', 'n_ingredients'], axis=1, inplace=True)
 
 	nlp = spacy.load('en_core_web_sm')

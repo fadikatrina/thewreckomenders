@@ -1,4 +1,4 @@
-from utils.logger import l
+from logger import l
 
 
 def explain_non_personalised():

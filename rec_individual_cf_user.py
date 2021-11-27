@@ -4,7 +4,7 @@ from lenskit.algorithms.user_knn import UserUser
 import pandas as pd
 
 
-def user_user_cf():
+def user_user_cf(df_users, group_users, group_unseen_recipes, group_flag=True):
 	user_user = UserUser(15, min_nbrs=3)
 	recsys = Recommender.adapt(user_user)
 	recsys.fit(df_users)
