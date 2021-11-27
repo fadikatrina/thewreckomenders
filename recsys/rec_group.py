@@ -1,8 +1,8 @@
 import pandas as pd
-from filter_healthy import apply_health_filter
+from utils.filter_healthy import apply_health_filter
 from rec_individual_cf_user import user_user_cf
 
-from logger import l
+from utils.logger import l
 
 
 df_recipes = None

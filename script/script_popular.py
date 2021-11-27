@@ -1,11 +1,11 @@
 import pandas as pd
-from logger import l
+from utils.logger import l
 
 
 def generate_popular_csv():
 	l.info("Started generating csv with popular recipes")
-	df_interactions = pd.read_csv('Data/RAW_interactions.csv')
-	df_recipes = pd.read_csv('Data/RAW_recipes.csv')
+	df_interactions = pd.read_csv('../Data/RAW_interactions.csv')
+	df_recipes = pd.read_csv('../Data/RAW_recipes.csv')
 	df_recipes.drop(
 		['contributor_id', 'submitted', 'tags', 'nutrition', 'n_steps', 'steps', 'description', 'ingredients'],
 		 axis=1, inplace=True)

@@ -1,6 +1,6 @@
-from helpers_data_load import df_popular, pd
-from expl_non_personalised import explain_non_personalised
-from logger import l
+from utils.helpers_data_load import df_popular, pd
+from expl.expl_non_personalised import explain_non_personalised
+from utils.logger import l
 
 
 def popularity_based():

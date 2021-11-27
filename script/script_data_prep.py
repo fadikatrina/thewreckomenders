@@ -1,6 +1,6 @@
 import pandas as pd
 from ast import literal_eval
-from logger import l
+from utils.logger import l
 from pathlib import Path
 import os
 from script_reliable import generate_reliable_csv
@@ -26,8 +26,8 @@ if __name__ == "__main__":
 		pass
 
 	# individual recommenders preparation - kNN
-	df_users = pd.read_csv('Data/PP_users.csv')
-	df_recipes = pd.read_csv('Data/PP_recipes.csv')
+	df_users = pd.read_csv('../Data/PP_users.csv')
+	df_recipes = pd.read_csv('../Data/PP_recipes.csv')
 
 	df_users.drop('techniques', axis=1, inplace=True)
 	df_users.drop('n_items', axis=1, inplace=True)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 	df_recipes.to_csv("Data/processed/knn_recipes.csv")
 
 	# group recommenders preparation
-	df_recipes_full = pd.read_csv('Data/RAW_recipes.csv')
+	df_recipes_full = pd.read_csv('../Data/RAW_recipes.csv')
 	df_recipes_full.drop('minutes', axis=1, inplace=True)
 	df_recipes_full.drop('contributor_id', axis=1, inplace=True)
 	df_recipes_full.drop('submitted', axis=1, inplace=True)

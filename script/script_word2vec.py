@@ -1,10 +1,5 @@
 import pandas as pd
-import numpy as np
-import random
-from tqdm import tqdm
-from gensim.models import Word2Vec
-import matplotlib.pyplot as plt
-from logger import l
+from utils.logger import l
 from sklearn.model_selection import train_test_split
 
 # model = gensim.models.Word2Vec.load("modelName.model")
@@ -18,8 +13,8 @@ from sklearn.model_selection import train_test_split
 
 def generate_trained_model():
 	l.info("Started generating of trained word2vec model")
-	df_recipes = pd.read_csv('Data/RAW_recipes.csv', sep=',')
-	df_interactions = pd.read_csv('Data/RAW_interactions.csv', sep=',')
+	df_recipes = pd.read_csv('../Data/RAW_recipes.csv', sep=',')
+	df_interactions = pd.read_csv('../Data/RAW_interactions.csv', sep=',')
 
 	l.info(f"missing values from df_recipes {df_recipes.isnull().sum()}")
 	l.info(f"missing values from df_interactions {df_interactions.isnull().sum()}")

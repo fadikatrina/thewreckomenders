@@ -1,10 +1,10 @@
-from logger import l
-from helpers_general import sample_users, how_many_reviews
-from rec_non_personalised import popularity_based
-from rec_individual_content_based import dont_know_yet
-from rec_individual_knn import knn
-from rec_group import group_recommender
-from helpers_data_load import df_users, recipe_data, df_recipes_full
+from utils.logger import l
+from utils.helpers_general import sample_users, how_many_reviews
+from recsys.rec_non_personalised import popularity_based
+from recsys.rec_individual_content_based import dont_know_yet
+from recsys.rec_individual_knn import knn
+from recsys.rec_group import group_recommender
+from utils.helpers_data_load import df_users, recipe_data, df_recipes_full
 
 settings = {
 	"recommender_type": 1,
