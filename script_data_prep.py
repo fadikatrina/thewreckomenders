@@ -1,7 +1,6 @@
 import pandas as pd
 from ast import literal_eval
 from logger import l
-from pathlib import Path
 import os
 from script_reliable import generate_reliable_csv
 from script_samples import generate_sample_csvs
@@ -11,8 +10,9 @@ if __name__ == "__main__":
     l.info("Data prep start")
 
     # Directory management
-    Path("/Data/processed").mkdir(parents=True, exist_ok=True)
-    Path("/Data/samples").mkdir(parents=True, exist_ok=True)
+    os.makedirs('Data/processed', exist_ok=True)
+    os.makedirs('Data/samples', exist_ok=True)
+
     if os.path.isfile("Data/processed/knn_recipes.csv"):
         input(
             "Seems like data prep is already done, no need to run this step everytime, if you insist press enter to continue")
