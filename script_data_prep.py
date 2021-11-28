@@ -29,7 +29,7 @@ if __name__ == "__main__":
     df_users = pd.read_csv('Data/PP_users.csv')
     df_recipes = pd.read_csv('Data/PP_recipes.csv')
 
-    df_users = df_users[df_users["n_ratings"] > 5]  # at least 5 ratings
+    df_users = df_users[df_users["n_ratings"] >= 5]  # at least 5 ratings
     df_users.drop('techniques', axis=1, inplace=True)
     df_users.drop('n_items', axis=1, inplace=True)
     df_users.drop('n_ratings', axis=1, inplace=True)
