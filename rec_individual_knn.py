@@ -11,6 +11,12 @@ df_recipes = None
 
 
 # todo:high add explanations
+# todo: use SVD
+# todo: experimenting the kNN with
+# - different k
+# - different size of sample
+# - different features
+
 def knn(df_users, recipe_data):
 	global df_recipes
 	# data loading usually in `helpers_data_load.py` but since this takes forever, would prefer to run it only if necessary
