@@ -4,15 +4,15 @@ import string
 
 
 def how_many_reviews(user_id):
-	return len(get_user_reviews(user_id).index)
+    return len(get_user_reviews(user_id).index)
 
 
 def get_user_reviews(user_id):
-	return df_users.loc[df_users['user'] == user_id]
+    return df_users.loc[df_users['user'] == user_id]
 
 
 def sample_users(count):
-	return df_users.sample(count)['user'].tolist()
+    return df_users.sample(count)['user'].tolist()
 
 
 # Returns how many users have less than the number of specified reviews

@@ -20,4 +20,3 @@ nlp = spacy.load('en_core_web_sm')
 
 
 l.debug("Data load finish")
-
