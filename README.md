@@ -102,6 +102,7 @@ Using Python 3.7, package versions specified in requirements txt
 - [ ]  Compare kNN vs SVD vs Content Based
 - [ ]  Compare kNN Group recommender vs. UserUser CF group recommender vs. ItemItem CF group recommender
 - [ ]  Compare group recommender aggregation strategies (probably qualitatively/inspection rather than quantitatively)
+- [ ]  Group: individual member satisfaction compared to the others
 
 ## User Flow
 1. Select User/Group recommender
