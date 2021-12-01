@@ -1,3 +1,5 @@
+from random import randrange
+
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -5,6 +7,8 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
+
+import expl_content_based
 from logger import l
 
 df_recipes = None
@@ -49,10 +53,10 @@ def knn(df_users, recipe_data):
 	y = y.apply(np.int64) # convert to int
 
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-	print('Xtrain:\n', X_train)
-	print('Xtest:\n', X_test)
-	print('ytrain:', y_train)
-	print('ytest:', y_test)
+	#print('Xtrain:\n', X_train)
+	#print('Xtest:\n', X_test)
+	#print('ytrain:', y_train)
+	#print('ytest:', y_test)
 
 	k = 3
 	knn = KNeighborsClassifier(n_neighbors=k)
@@ -61,19 +65,17 @@ def knn(df_users, recipe_data):
 	y_pred_train = knn.predict(X_train)
 	y_pred_test = knn.predict(X_test)
 
-	# todo:high compare expected outputs with actual outputs
-	# todo:high add evaluation
-	X_new = [[30, 10]]  # [feature1, feature2]
-	# [1,10] gives 4
-	# [1, 15] gives 4
+	rand = randrange(len(df_sample))
+	name = df_sample.iloc[rand, 4]
+
+	X_new = [[df_sample.iloc[rand, feature1], df_sample.iloc[rand, feature2]]]  # [feature1, feature2]
 	y_predict = knn.predict(X_new)
 
 	print('k =', k)
 	print('sample size =', sample_size)
 	print('features =', titles[feature1],' and', titles[feature2])
 	print('---------------------')
-	print('For a recipes that has', titles[feature1], '=', X_new[0][0], 'and', titles[feature2], '=', X_new[0][1],
-		  'ingredients, gets a rating of', y_predict[0])
+	print('EXPLANATION\n:', expl_content_based.indiv_CB(name, y_predict, k, titles[feature1], titles[feature2]))
 
 	print('Accuracy on training data =', metrics.accuracy_score(np.array(y_train.to_list()), y_pred_train))
 	print('Accuracy on testing data =', metrics.accuracy_score(np.array(y_test.to_list()), y_pred_test))

@@ -60,5 +60,5 @@ def test(df_users, recipe_data):
 if __name__ == "__main__":
 	recipe_data = pd.read_csv('Data/RAW_recipes.csv', sep=',')
 	df_users = pd.read_csv('Data/processed/knn_users.csv')
-	#knn(df_users, recipe_data)
-	test(df_users, recipe_data)
+	knn(df_users, recipe_data)
+	#test(df_users, recipe_data)
