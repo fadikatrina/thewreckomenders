@@ -10,16 +10,12 @@ The SVD takes the recipe data, vectorizes the texts with TF-IDF and applies SVD 
 '''
 
 
-def getVectorizedData():
+def getVectorizedData(data):
 	np.random.seed(0)
-	recipe_data = pd.read_csv('Data/RAW_recipes.csv', sep=',')
 
-	recipe_ids = recipe_data['id']
-	minutes = recipe_data['minutes']
-	tags = recipe_data['tags']
-	nutrition = recipe_data['nutrition']
-	steps = recipe_data['steps']
-	ingredients = recipe_data['ingredients']
+	tags = data['tags']
+	steps = data['steps']
+	ingredients = data['ingredients']
 
 	vectorizer = TfidfVectorizer(max_features=500)
 	X = {'tags': tags, 'steps': steps, 'ingredients': ingredients}
@@ -28,8 +24,8 @@ def getVectorizedData():
 	return X, vectorizer
 
 
-def findGoodNumberOfComponents():
-	X, vectorizer = getVectorizedData()
+def findGoodNumberOfComponents(data):
+	X, vectorizer = getVectorizedData(data)
 
 	test_values = [1, 3, 5, 10, 50, 100, 200, 300]
 	results = []
@@ -52,13 +48,8 @@ def findGoodNumberOfComponents():
 def svd(X, vectorizer, components=100):
 	# We're using a truncated SVD, since these are more efficient on sparse data and TF-IDF produces very sparse data
 	svd = TruncatedSVD(n_components=components, n_iter=10, random_state=1)
-	svd.fit_transform(vectorizer.fit_transform(X['tags'] + X['steps'] + X['ingredients']))
+	data = svd.fit_transform(vectorizer.fit_transform(X['tags'] + X['steps'] + X['ingredients']))
 	# print(svd.explained_variance_ratio_)
 	# print(svd.explained_variance_ratio_.sum())
 
-	return svd
-
-
-if __name__ == "__main__":
-	X, vectorizer = getVectorizedData
-	svd(X, vectorizer)
+	return data

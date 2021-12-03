@@ -1,5 +1,6 @@
 from random import randrange
 
+from IPython.core.display import display
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -7,7 +8,8 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-
+from helpers_data_load import df_users, recipe_data
+from rec_individual_svd import getVectorizedData, svd
 import expl_content_based
 from logger import l
 
@@ -21,77 +23,49 @@ df_recipes = None
 # - different size of sample
 # - different features
 
-def knn(df_users, recipe_data):
-	global df_recipes
-	# data loading usually in `helpers_data_load.py` but since this takes forever, would prefer to run it only if necessary
-	# since its global will run only once per application cycle even if knn is run multiple times
-	if not df_recipes:
-		df_recipes = pd.read_csv('Data/processed/knn_recipes.csv')
+def knn(df_users, recipe_data, selected_user, svdFlag):
+    recipe_data.index.name = 'item'
 
-	tags = recipe_data['tags']
-	steps = recipe_data['steps']
-	ingredients = recipe_data['ingredients']
+    selected_user_ratings = df_users.loc[df_users['user'] == selected_user]
+    selected_user_ratings = selected_user_ratings.sort_values(by='item', ascending=True)
 
-	vectorizer = TfidfVectorizer(max_features=10000)
-	tags = vectorizer.fit_transform(tags)
-	steps = vectorizer.fit_transform(steps)
-	ingredients = vectorizer.fit_transform(ingredients)
+    print("Rated movies: " + str(selected_user_ratings.shape[0]))
 
-	df_recipes = recipe_data.rename(columns={'id': 'recipe_id'})
-	df_users = df_users.rename(columns={'item': 'recipe_id'})
-	df = pd.merge(df_users, df_recipes, on='recipe_id')
-	sample_size = 100000
-	df_sample = df.sample(n=sample_size)
+    rated_recipes_df = recipe_data.loc[list(selected_user_ratings['item'])]
+    rated_recipes_df = rated_recipes_df[['tags', 'steps', 'ingredients']]
+    rated_recipes_df = rated_recipes_df.join(selected_user_ratings.set_index('item')['rating'], on='item')
 
-	titles = list(df_sample.columns)
-	# ['Unnamed: 0', 'user', 'recipe_id', 'rating', 'name', 'minutes', 'contributor_id',
-	# 'submitted', 'tags', 'nutrition', 'n_steps', 'steps', 'description', 'ingredients', 'n_ingredients']
-	feature1 = 5
-	feature2 = 14
-	X = df_sample.iloc[:, [feature1, feature2]] # training data (nrs of steps and nr of ingredients)
-	y = df_sample['rating'] # predicted value
-	y = y.apply(np.int64) # convert to int
+    diff = set(recipe_data.index) - set(rated_recipes_df.index)
+    unrated_recipes_df = recipe_data.loc[diff]
+    unrated_recipes_df = unrated_recipes_df[['tags', 'steps', 'ingredients']]
 
-	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-	#print('Xtrain:\n', X_train)
-	#print('Xtest:\n', X_test)
-	#print('ytrain:', y_train)
-	#print('ytest:', y_test)
+    x, vectorizer = getVectorizedData(rated_recipes_df)
+    x_unrated = getVectorizedData(unrated_recipes_df)[0]
+    y = rated_recipes_df['rating']
 
-	k = 3
-	knn = KNeighborsClassifier(n_neighbors=k)
-	knn.fit(X_train, y_train)
+    components = selected_user_ratings.shape[0]
 
-	y_pred_train = knn.predict(X_train)
-	y_pred_test = knn.predict(X_test)
+    if components > 100:
+        components = 100
 
-	rand = randrange(len(df_sample))
-	name = df_sample.iloc[rand, 4]
+    if svdFlag:
+        x = svd(x, vectorizer, components)
+        x_unrated = svd(x_unrated, vectorizer, components)
+    else:
+        x = vectorizer.fit_transform(x['tags'] + x['steps'] + x['ingredients'])
+        x_unrated = vectorizer.transform(x_unrated['tags'] + x_unrated['steps'] + x_unrated['ingredients'])
 
-	X_new = [[df_sample.iloc[rand, feature1], df_sample.iloc[rand, feature2]]]  # [feature1, feature2]
-	y_predict = knn.predict(X_new)
+    neigh = KNeighborsRegressor(n_neighbors=5)
 
-	print('k =', k)
-	print('sample size =', sample_size)
-	print('features =', titles[feature1],' and', titles[feature2])
-	print('---------------------')
-	print('EXPLANATION\n:', expl_content_based.indiv_CB(name, y_predict, k, titles[feature1], titles[feature2]))
+    print(x)
+    print(y)
+    neigh.fit(x, y)
 
-	print('Accuracy on training data =', metrics.accuracy_score(np.array(y_train.to_list()), y_pred_train))
-	print('Accuracy on testing data =', metrics.accuracy_score(np.array(y_test.to_list()), y_pred_test))
-	print('')
-	print(metrics.classification_report(np.array(y_test.to_list()), y_pred_test))
+    y_unrated = neigh.predict(x_unrated)
+    unrated_recipes_df['predicted_ratings_KNN'] = y_unrated
+    unrated_recipes_df = unrated_recipes_df.sort_values(by='predicted_ratings_KNN', ascending=False)
+    display(unrated_recipes_df.head())
 
-	l.info('k =')
-	l.info(k)
-	l.info('sample size =')
-	l.info(sample_size)
-	l.info('features = ')
-	l.info(titles[feature1])
-	l.info(titles[feature2])
-	l.info('Accuracy on training data =')
-	l.info(metrics.accuracy_score(np.array(y_train.to_list()), y_pred_train))
-	l.info('Accuracy on testing data =')
-	l.info(metrics.accuracy_score(np.array(y_test.to_list()), y_pred_test))
-	l.info(metrics.classification_report(np.array(y_test.to_list()), y_pred_test))
 
+knn(df_users, recipe_data, 714, False)
+knn(df_users, recipe_data, 714, True)
