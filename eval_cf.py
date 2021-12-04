@@ -10,7 +10,7 @@ from helpers_data_load import df_recipes_full, df_users
 def hold_out_uu(test_size):
     train_df, test_df = train_test_split(df_users, test_size=test_size)
 
-    user_user = UserUser(15, min_nbrs=3)
+    user_user = UserUser(12, min_nbrs=7)
     recsys = Recommender.adapt(user_user)
     recsys.fit(train_df)
 
@@ -35,7 +35,7 @@ def hold_out_uu(test_size):
 def hold_out_ii(test_size):
     train_df, test_df = train_test_split(df_users, test_size=test_size)
 
-    item_item = ItemItem(15, min_nbrs=3)
+    item_item = ItemItem(12, min_nbrs=7)
     recsys = Recommender.adapt(item_item)
     recsys.fit(train_df)
 
@@ -56,7 +56,6 @@ def hold_out_ii(test_size):
     print('---ItemItem Metrics Results---')
     print('Hold-Out Evaluation; test_size =', test_size)
     print('Precision:', precision, '\nRecall:', recall, '\nFscore:', fscore, '\nRMSE:', rmse, '\nCoverage:', coverage)
-
 
 
 hold_out_uu(0.2)

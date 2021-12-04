@@ -1,10 +1,12 @@
 import pandas as pd
+from IPython.core.display import display
+
 from filter_healthy import apply_health_filter
 from rec_cf import user_user_cf_group
 from rec_cf import item_item_cf_group
 from logger import l
 from helpers_data_load import df_users, df_recipes_full
-import expl_cf_group
+import expl_cf
 
 df_recipes = None
 
@@ -76,6 +78,7 @@ def strategy_least_misery(group_unseen_df, df_recipes_full_gr):
     least_misery_df = group_unseen_df.groupby(['item']).min().reset_index()
     least_misery_df = least_misery_df.join(df_recipes_full_gr['name'], on='item')
     items_lm = least_misery_df['item'].copy()
+    unhealthy_choice = least_misery_df['name'].iloc[0]
     healthy_lm = apply_health_filter(items_lm)
 
     least_misery_df['healthy'] = least_misery_df['item'].apply(lambda x: 1 if x in healthy_lm else 0)
@@ -83,23 +86,27 @@ def strategy_least_misery(group_unseen_df, df_recipes_full_gr):
         ['item', 'predicted_rating', 'name', 'healthy']]
 
     least_misery_df = least_misery_df[least_misery_df.healthy == 1]
-    print(expl_cf_group.expl_least_misery(least_misery_df['name'].iloc[0]))
+    expl_cf.expl_least_misery(least_misery_df['name'].iloc[0], unhealthy_choice,
+                              str(least_misery_df['predicted_rating'].iloc[0]))
+
     return least_misery_df
 
 
 def strategy_most_pleasure(group_unseen_df, df_recipes_full_gr):
     most_pleasure_df = group_unseen_df.groupby(['item']).max().reset_index()
+    most_pleasure_df = most_pleasure_df.join(df_recipes_full_gr['name'], on='item')
     items_mp = most_pleasure_df['item'].copy()
+    unhealthy_choice = most_pleasure_df['name'].iloc[0]
     healthy_mp = apply_health_filter(items_mp)
 
     most_pleasure_df['healthy'] = most_pleasure_df['item'].apply(lambda x: 1 if x in healthy_mp else 0)
-
-    most_pleasure_df = most_pleasure_df.join(df_recipes_full_gr['name'], on='item').reset_index()
-    most_pleasure_df = most_pleasure_df.sort_values(by="predicted_rating", ascending=False).reset_index()[
+    most_pleasure_df = most_pleasure_df.sort_values(by="predicted_rating", ascending=False)[
         ['item', 'predicted_rating', 'name', 'healthy']]
 
     most_pleasure_df = most_pleasure_df[most_pleasure_df.healthy == 1]
-    print(expl_cf_group.expl_most_pleasure(most_pleasure_df['name'].iloc[0]))
+    expl_cf.expl_most_pleasure(most_pleasure_df['name'].iloc[0], unhealthy_choice,
+                               str(most_pleasure_df['predicted_rating'].iloc[0]))
+
     return most_pleasure_df
 
 
@@ -114,9 +121,12 @@ def strategy_approval_voting(group_unseen_df, df_recipes_full_gr, random_selecte
     approval_df = approval_df.sort_values(by="predicted_rating",
                                           ascending=False).reset_index()  # Get the best rated items with max approval
     approval_df = approval_df.join(df_recipes_full_gr['name'], on='item')
-    print(expl_cf_group.expl_approval_voting(approval_df['name'].iloc[0]))
+    expl_cf.expl_approval_voting(approval_df['name'].iloc[0], str(approval_df['voted'].iloc[0]),
+                                 str(approval_df['predicted_rating'].iloc[0]))
+
     return approval_df
 
 
 group_recommender(df_users, df_recipes_full, 1, 1)
 group_recommender(df_users, df_recipes_full, 3, 2)
+group_recommender(df_users, df_recipes_full, 2, 1)

@@ -1,52 +1,36 @@
+from random import randrange
+
 from IPython.core.display import display
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.feature_extraction.text import TfidfVectorizer
-import pandas as pd
+from sklearn.metrics import r2_score
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn import metrics
-from rec_individual_svd import getVectorizedData, svd
-from logger import l
 import helpers_data_load as dl
+import expl_knn
+
+df_recipes = None
 
 
-# todo:high add explanations
-# todo: use SVD
-# todo: experimenting the kNN with
-# - different k
-# - different size of sample
-# - different features
-def knn(users_df, recipe_df, selected_user, svdFlag):
-    rated_recipes_df, unrated_recipes_df = prepare_data(users_df, recipe_df, False, selected_user)
-    x, vectorizer = getVectorizedData(rated_recipes_df)
-    x_unrated = getVectorizedData(unrated_recipes_df)[0]
+def knn(users_df, recipe_df, selected_user):
+    rated_recipes_df, unrated_recipes_df = prepare_data(users_df, recipe_df, selected_user)
+    x = rated_recipes_df.drop('rating', axis=1)
     y = rated_recipes_df['rating']
+    x_unrated = unrated_recipes_df
 
-    components = len(rated_recipes_df)
+    neigh = KNeighborsRegressor(n_neighbors=6)
 
-    if components > 100:
-        components = 100
-
-    if svdFlag:
-        x = svd(x, vectorizer, components)
-        x_unrated = svd(x_unrated, vectorizer, components)
-    else:
-        x = vectorizer.fit_transform(x['tags'] + x['steps'] + x['ingredients'])
-        x_unrated = vectorizer.transform(x_unrated['tags'] + x_unrated['steps'] + x_unrated['ingredients'])
-
-    neigh = KNeighborsRegressor(n_neighbors=5)
-
-    print(x)
-    print(y)
+    # print(x)
+    # print(y)
     neigh.fit(x, y)
 
     y_unrated = neigh.predict(x_unrated)
     unrated_recipes_df['predicted_ratings_KNN'] = y_unrated
     unrated_recipes_df = unrated_recipes_df.sort_values(by='predicted_ratings_KNN', ascending=False)
     display(unrated_recipes_df.head())
+    row = dl.recipes_raw.loc[dl.recipes_raw.index[unrated_recipes_df.index[0] + 1]]
+    expl_knn.indiv_CB(str(row['name']), str(unrated_recipes_df['predicted_ratings_KNN'].iloc[0]))
 
 
 def prepare_data(users, recipes, selected_user):
@@ -55,40 +39,33 @@ def prepare_data(users, recipes, selected_user):
     selected_user_ratings = users.loc[users['user'] == selected_user]
     selected_user_ratings = selected_user_ratings.sort_values(by='item', ascending=True)
 
-    print("Rated recipes: " + str(selected_user_ratings.shape[0]))
-
+    # print("Rated recipes: " + str(selected_user_ratings.shape[0]))
+    recipes['minutes'] = min_max_scaling(recipes['minutes'])
+    recipes['n_steps'] = min_max_scaling(recipes['n_steps'])
     rated_recipes_df = recipes.loc[list(selected_user_ratings['item'])]
-    rated_recipes_df = rated_recipes_df[['tags', 'steps', 'ingredients']]
+    rated_recipes_df = rated_recipes_df[['minutes', 'n_steps']]
     rated_recipes_df = rated_recipes_df.join(selected_user_ratings.set_index('item')['rating'], on='item')
 
     diff = set(recipes.index) - set(rated_recipes_df.index)
     unrated_recipes_df = recipes.loc[diff]
-    unrated_recipes_df = unrated_recipes_df[['tags', 'steps', 'ingredients']]
+    unrated_recipes_df = unrated_recipes_df[['minutes', 'n_steps']]
 
     return rated_recipes_df, unrated_recipes_df
 
 
-def train_test_holdout(users, recipes, selectedUser, svdFlag):
+def train_test_holdout(users, recipes, selectedUser):
     rated = prepare_data(users, recipes, selectedUser)[0]
 
-    x, vectorizer = getVectorizedData(rated)
-    y = rated['rating']
+    train, test = train_test_split(rated, test_size=0.2)
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+    x_train = train.drop('rating', axis=1)
+    y_train = train['rating']
 
-    components = len(y)
-    if components > 75:
-        components = 75
+    x_test = test.drop('rating', axis=1)
+    y_test = test['rating']
 
-    if svdFlag:
-        x_train = svd(x_train, vectorizer, components)
-        x_test = svd(x_test, vectorizer, components)
-    else:
-        x_train = vectorizer.fit_transform(x_train['tags'] + x_train['steps'] + x_train['ingredients'])
-        x_test = vectorizer.transform(x_test['tags'] + x_test['steps'] + x_test['ingredients'])
-
-    neigh = KNeighborsRegressor(n_neighbors=5)
-    neigh.fit(x_train, y_train)  # train our cassifier
+    neigh = KNeighborsRegressor(n_neighbors=6)
+    neigh.fit(x_train, y_train)  # train our classifier
 
     y_pred = neigh.predict(x_test)  # evaluates the predictions of the classifier
     relevant_test = []
@@ -104,14 +81,16 @@ def train_test_holdout(users, recipes, selectedUser, svdFlag):
         else:
             relevant_pred.append(0)
 
-    print(y_test)
-    print(y_pred)
-    print(relevant_test)
-    print(relevant_pred)
+    # print(y_test)
+    # print(y_pred)
+    # print(relevant_test)
+    # print(relevant_pred)
     precision, recall, fscore, _ = precision_recall_fscore_support(relevant_test, relevant_pred,
                                                                    average="binary", zero_division=0)
     rmse = mean_squared_error(y_test, y_pred, squared=False)
-    return precision, recall, fscore, rmse
+    r_squared = r2_score(y_test, y_pred)
+
+    return precision, recall, fscore, rmse, r_squared
 
 
 def holdout(users, recipes):
@@ -120,26 +99,31 @@ def holdout(users, recipes):
     recall_list = []
     fscore_list = []
     rmse_list = []
+    r2_list = []
+    counter = 0
 
     for user in user_list:
         selected_user_ratings = users.loc[users['user'] == user]
 
-        if len(selected_user_ratings) > 100:
-            precision, recall, fscore, rmse = train_test_holdout(users, recipes, user, False)
-            if precision > 0:
-                precision_list.append(precision)
-            if recall > 0:
-                recall_list.append(recall)
-            if fscore > 0:
-                fscore_list.append(fscore)
-            if rmse > 0:
-                rmse_list.append(rmse)
+        if 15 >= len(selected_user_ratings) >= 8:
+            counter += 1
+            precision, recall, fscore, rmse, r2 = train_test_holdout(users, recipes, user)
+            precision_list.append(precision)
+            recall_list.append(recall)
+            fscore_list.append(fscore)
+            rmse_list.append(rmse)
+            r2_list.append(r2)
 
     print('Precision', np.mean(precision_list))
     print('Recall', np.mean(recall_list))
     print('Fscore', np.mean(fscore_list))
     print('RMSE', np.mean(rmse_list))
+    print('R-squared', np.mean(r2_list))
+    print('Evaluated on', counter, 'users')
 
 
-print(holdout(dl.df_users, dl.recipes_raw))
-# print(train_test_holdout(df_users, recipe_data, 555, False))
+def min_max_scaling(column):
+    max_val = column.max()
+    min_val = column.min()
+    column = (column - min_val) / (max_val - min_val)
+    return column
