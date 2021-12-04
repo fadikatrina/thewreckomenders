@@ -1,10 +1,10 @@
 from logger import l
 from helpers_general import sample_users, how_many_reviews
 from rec_non_personalised import popularity_based
-from rec_individual_content_based import dont_know_yet
+from rec_individual_content_based import fasttext_keywords
 from rec_individual_knn import knn
 from rec_group import group_recommender
-from helpers_data_load import df_users, recipe_data, df_recipes_full
+import helpers_data_load as dl
 
 settings = {
 	"recommender_type": 1,
@@ -63,7 +63,7 @@ def start(config={}):
 				config["relationship"] = int(input("What is the type of relationship between the users? ") or "1")
 				l.info(f"relationship {config['relationship']}")
 			l.debug("Group recommender started")
-			group_recommendation = group_recommender(df_users, df_recipes_full, config["relationship"])
+			group_recommendation = group_recommender(dl.df_users, dl.df_recipes_full, config["relationship"])
 			l.info(f"group_recommendation {group_recommendation}")
 		else:
 			l.debug("Individual recommendations branch")
@@ -84,11 +84,12 @@ def start(config={}):
 					l.info("No keywords provided, exiting")
 					exit(0)
 				l.debug("Starting Content Based Individual Recommedner")
-				dont_know_yet(config['keywords'])
+				fasttext_keywords(config['keywords'])
 			else:
 				l.info(
 					f"The user has {user_reviews_count}, which is more than {config['min_reviews_for_personalised']} reviews, making individual recommendations using kNN")
-				individual_recommendation = knn(df_users, recipe_data)
+				# URGENT fix the way knn is called here
+				individual_recommendation = knn()
 				l.info(f"individual_recommendation {individual_recommendation}")
 		more_recs = int(input("Input 0 to quit, 1 to try another algorithm") or "0")
 
