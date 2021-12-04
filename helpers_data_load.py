@@ -16,7 +16,7 @@ df_users = pd.read_csv('Data/processed/knn_users.csv')
 df_recipes_full = pd.read_csv('Data/processed/group_recipes.csv')
 
 # NLP Spacy
-nlp = spacy.load('en_core_web_sm')
+# nlp = spacy.load('en_core_web_sm')
 
 
 l.debug("Data load finish")
