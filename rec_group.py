@@ -22,7 +22,6 @@ def group_recommender(df_users_gr, df_recipes_full_gr, chosen_strategy, chosen_u
     if chosen_useritem not in [1, 2]:
         raise ValueError("Group recommender: chosen algorithm has to be 1 or 2")
 
-    # todo:high switch this to the user provided parameters from main
     users_ratings = df_users_gr.groupby(['user']).count()  # count the ratings for each user
     selected = users_ratings['rating'] > 30  # keep only 30 + ratings
     selected_users = users_ratings.loc[selected]
@@ -45,9 +44,6 @@ def group_recommender(df_users_gr, df_recipes_full_gr, chosen_strategy, chosen_u
     l.info(f'Recipes that have at least 30 ratings, {len(considered_recipes)}')
     l.info(f'Recipes that have been rated by the currently selected group: {len(group_seen_recipes)}')
     l.info(f'New recipes that the group didnt try yet: {len(group_unseen_recipes)}')
-
-    # exp:easy would be interesting to try different algorithms for prediction and see their affect on the number of
-    #  missing ratings and coverage/accuracy metrics
 
     # todo:med switch these variables from being provided to CF here to being found by the CF itself,
     #  i.e. better decoupling

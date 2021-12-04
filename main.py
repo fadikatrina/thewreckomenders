@@ -24,9 +24,11 @@ settings = {
 }
 
 
-# enh:med make one function that all the algorithms call with the recommendations and explanations so the output is
-#  comparable/measurable easily todo:high actually filter according to the variables input by the user - whole team
-#   needs to agree on mechanism for this
+# URGENT fix the way knn is called here
+# URGENT change cut off between non-personalised and rest to 7
+# URGENT change to cf for 15 and above reviews
+# URGENT user picks between itemitem and useruser
+# URGENT filter from data load based on these values
 def start(config={}):
 	l.debug("Application start")
 	if not config:
@@ -75,7 +77,6 @@ def start(config={}):
 				l.info(
 					f"Because the user has less than {config['min_reviews_for_personalised']} ratings, non-personalised popularity based recommendations will be made")
 				popularity_based()
-				# exp:easy evaluation of effect of different number of keywords
 				if not config["keywords"]:
 					config['keywords'] = [x for x in input(
 						"If you would like content-based recommendations based on keywords you specify, please specify the keywords seperated by spaces. Do not enter keywords to skip.").split()]
@@ -88,7 +89,6 @@ def start(config={}):
 			else:
 				l.info(
 					f"The user has {user_reviews_count}, which is more than {config['min_reviews_for_personalised']} reviews, making individual recommendations using kNN")
-				# URGENT fix the way knn is called here
 				individual_recommendation = knn()
 				l.info(f"individual_recommendation {individual_recommendation}")
 		more_recs = int(input("Input 0 to quit, 1 to try another algorithm") or "0")

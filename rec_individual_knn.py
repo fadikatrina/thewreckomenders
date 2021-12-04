@@ -14,7 +14,6 @@ import helpers_data_load as dl
 
 
 # todo:high add explanations
-# todo: use SVD
 # todo: experimenting the kNN with
 # - different k
 # - different size of sample
