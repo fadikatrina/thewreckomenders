@@ -1,5 +1,3 @@
-from random import randrange
-
 from IPython.core.display import display
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import mean_squared_error
@@ -10,12 +8,9 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from helpers_data_load import df_users, recipe_data
 from rec_individual_svd import getVectorizedData, svd
-import expl_content_based
 from logger import l
-
-df_recipes = None
+import helpers_data_load as dl
 
 
 # todo:high add explanations
@@ -24,7 +19,6 @@ df_recipes = None
 # - different k
 # - different size of sample
 # - different features
-
 def knn(users_df, recipe_df, selected_user, svdFlag):
     rated_recipes_df, unrated_recipes_df = prepare_data(users_df, recipe_df, False, selected_user)
     x, vectorizer = getVectorizedData(rated_recipes_df)
@@ -147,5 +141,5 @@ def holdout(users, recipes):
     print('RMSE', np.mean(rmse_list))
 
 
-print(holdout(df_users, recipe_data))
+print(holdout(dl.df_users, dl.recipes_raw))
 # print(train_test_holdout(df_users, recipe_data, 555, False))
