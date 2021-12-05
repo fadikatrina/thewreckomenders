@@ -129,6 +129,3 @@ def min_max_scaling(column):
     column = (column - min_val) / (max_val - min_val)
     return column
 
-
-dl.load_recipes_raw()
-knn(dl.df_users, dl.recipes_raw, 555)
