@@ -1,5 +1,4 @@
 import pandas as pd
-from IPython.core.display import display
 
 from filter_healthy import apply_health_filter
 from rec_cf import user_user_cf_group
@@ -123,6 +122,6 @@ def strategy_approval_voting(group_unseen_df, df_recipes_full_gr, random_selecte
     return approval_df
 
 
-group_recommender(df_users, df_recipes_full, 1, 1)
-group_recommender(df_users, df_recipes_full, 3, 2)
-group_recommender(df_users, df_recipes_full, 2, 1)
+# group_recommender(df_users, df_recipes_full, 1, 1)
+# group_recommender(df_users, df_recipes_full, 3, 2)
+# group_recommender(df_users, df_recipes_full, 2, 1)

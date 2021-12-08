@@ -1,6 +1,5 @@
 from random import randrange
 
-from IPython.core.display import display
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsRegressor
@@ -28,7 +27,6 @@ def knn(users_df, recipe_df, selected_user):
     y_unrated = neigh.predict(x_unrated)
     unrated_recipes_df['predicted_ratings_KNN'] = y_unrated
     unrated_recipes_df = unrated_recipes_df.sort_values(by='predicted_ratings_KNN', ascending=False)
-    # display(unrated_recipes_df.head())
     row = dl.recipes_raw.loc[dl.recipes_raw.index[unrated_recipes_df.index[0] + 1]]
     expl_knn.indiv_CB(str(row['name']), str(unrated_recipes_df['predicted_ratings_KNN'].iloc[0]))
 

@@ -16,6 +16,12 @@ def generate_fasttext_trained_model():
 	model.save_model(settings.FASTTEXT_MODEL_PATH_NORMAL)
 
 
+def generate_fasttext_trained_model_auto_parameters():
+	l.info(f"Training of model with autotune started")
+	model = fasttext.train_supervised(input='Data/processed/fasttext_training_enriched.txt', autotuneValidationFile='Data/processed/fasttext_testing_enriched.txt')
+	model.save_model(settings.FASTTEXT_MODEL_PATH_NORMAL_AUTO)
+
+
 def quantize():
 	l.info("Quantizing model")
 	model = fasttext.load_model(settings.FASTTEXT_MODEL_PATH_NORMAL)
@@ -100,7 +106,8 @@ if __name__ == "__main__":
 	# clean_and_export_recipes()
 	# make_recipe_id_user_id_file()
 	# enrich_training_file_more_user_labels()
-	generate_fasttext_trained_model()
-	quantize()
-	fasttext_auto_eval()
-	show_words_labels()
+	# generate_fasttext_trained_model()
+	# quantize()
+	# fasttext_auto_eval()
+	# show_words_labels()
+	generate_fasttext_trained_model_auto_parameters()

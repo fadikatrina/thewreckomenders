@@ -41,5 +41,5 @@ def log_words_labels(w_or_l, freq):
 
 
 if __name__ == "__main__":
-	show_words_labels()
+	# show_words_labels()
 	fasttext_auto_eval()

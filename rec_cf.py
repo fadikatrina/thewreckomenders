@@ -1,6 +1,5 @@
 import itertools
 
-from IPython.core.display import display
 from lenskit.algorithms import Recommender
 from lenskit.algorithms.user_knn import UserUser
 from lenskit.algorithms.item_knn import ItemItem
@@ -42,7 +41,6 @@ def user_user_cf(df_users, df_recipes_full, num_recs, user_id):
     recommended_items = recsys.recommend(user_id, num_recs)
     recommended_items = recommended_items.join(df_recipes_full['name'], on='item')
     recommended_items['score'] = min_max_scaling(recommended_items['score'])
-    display(recommended_items.head())
     row = recommended_items.iloc[0]
     expl.individual_user(row['name'], str(row['score']))
 
