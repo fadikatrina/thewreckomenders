@@ -28,7 +28,7 @@ def knn(users_df, recipe_df, selected_user):
     y_unrated = neigh.predict(x_unrated)
     unrated_recipes_df['predicted_ratings_KNN'] = y_unrated
     unrated_recipes_df = unrated_recipes_df.sort_values(by='predicted_ratings_KNN', ascending=False)
-    display(unrated_recipes_df.head())
+    # display(unrated_recipes_df.head())
     row = dl.recipes_raw.loc[dl.recipes_raw.index[unrated_recipes_df.index[0] + 1]]
     expl_knn.indiv_CB(str(row['name']), str(unrated_recipes_df['predicted_ratings_KNN'].iloc[0]))
 
@@ -42,13 +42,14 @@ def prepare_data(users, recipes, selected_user):
     # print("Rated recipes: " + str(selected_user_ratings.shape[0]))
     recipes['minutes'] = min_max_scaling(recipes['minutes'])
     recipes['n_steps'] = min_max_scaling(recipes['n_steps'])
+    recipes['n_ingredients'] = min_max_scaling(recipes['n_ingredients'])
     rated_recipes_df = recipes.loc[list(selected_user_ratings['item'])]
-    rated_recipes_df = rated_recipes_df[['minutes', 'n_steps']]
+    rated_recipes_df = rated_recipes_df[['minutes']]
     rated_recipes_df = rated_recipes_df.join(selected_user_ratings.set_index('item')['rating'], on='item')
 
     diff = set(recipes.index) - set(rated_recipes_df.index)
     unrated_recipes_df = recipes.loc[diff]
-    unrated_recipes_df = unrated_recipes_df[['minutes', 'n_steps']]
+    unrated_recipes_df = unrated_recipes_df[['minutes']]
 
     return rated_recipes_df, unrated_recipes_df
 
@@ -56,7 +57,7 @@ def prepare_data(users, recipes, selected_user):
 def train_test_holdout(users, recipes, selectedUser):
     rated = prepare_data(users, recipes, selectedUser)[0]
 
-    train, test = train_test_split(rated, test_size=0.2)
+    train, test = train_test_split(rated, test_size=0.1)
 
     x_train = train.drop('rating', axis=1)
     y_train = train['rating']
@@ -64,7 +65,7 @@ def train_test_holdout(users, recipes, selectedUser):
     x_test = test.drop('rating', axis=1)
     y_test = test['rating']
 
-    neigh = KNeighborsRegressor(n_neighbors=6)
+    neigh = KNeighborsRegressor(n_neighbors=12)
     neigh.fit(x_train, y_train)  # train our classifier
 
     y_pred = neigh.predict(x_test)  # evaluates the predictions of the classifier
@@ -88,7 +89,7 @@ def train_test_holdout(users, recipes, selectedUser):
     precision, recall, fscore, _ = precision_recall_fscore_support(relevant_test, relevant_pred,
                                                                    average="binary", zero_division=0)
     rmse = mean_squared_error(y_test, y_pred, squared=False)
-    r_squared = r2_score(y_test, y_pred)
+    r_squared = r2_score(relevant_test, relevant_pred)
 
     return precision, recall, fscore, rmse, r_squared
 
@@ -105,7 +106,7 @@ def holdout(users, recipes):
     for user in user_list:
         selected_user_ratings = users.loc[users['user'] == user]
 
-        if 15 >= len(selected_user_ratings) >= 8:
+        if len(selected_user_ratings) >= 150:
             counter += 1
             precision, recall, fscore, rmse, r2 = train_test_holdout(users, recipes, user)
             precision_list.append(precision)
@@ -127,3 +128,4 @@ def min_max_scaling(column):
     min_val = column.min()
     column = (column - min_val) / (max_val - min_val)
     return column
+
